@@ -29,7 +29,7 @@ const Hero = () => {
           <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-blue-200">
             Get Started <ArrowRight size={18} />
           </button>
-          <button className="flex items-center gap-2 bg-white hover:bg-blue-500 hover:text-white text-gray-700 border border-gray-200 px-8 py-3.5 rounded-full font-semibold transition-all">
+          <button className="flex items-center gap-2 bg-white hover:bg-blue-700 hover:text-white text-gray-700 border border-gray-200 px-8 py-3.5 rounded-full font-semibold transition-all">
             <Upload size={18} /> Upload Notes
           </button>
         </div>
