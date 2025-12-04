@@ -2,7 +2,11 @@
 import React from 'react';
 import { ArrowRight, Upload, Sparkles, FileText, CheckCircle } from 'lucide-react';
 
-const Hero = () => {
+interface HeroProps {
+  onNavigate: (view: string) => void;
+}
+
+const Hero = ({ onNavigate }: HeroProps) => {
   return (
     <section className="pt-20 pb-16 px-4 bg-gradient-to-b from-white to-blue-50/30">
       <div className="max-w-6xl mx-auto text-center">
@@ -26,10 +30,10 @@ const Hero = () => {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-blue-200">
+          <button onClick={() => onNavigate('upload')} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-blue-200">
             Get Started <ArrowRight size={18} />
           </button>
-          <button className="flex items-center gap-2 bg-white hover:bg-blue-700 hover:text-white text-gray-700 border border-gray-200 px-8 py-3.5 rounded-full font-semibold transition-all">
+          <button onClick={() => onNavigate('upload')} className="flex items-center gap-2 bg-white hover:bg-blue-700 hover:text-white text-gray-700 border border-gray-200 px-8 py-3.5 rounded-full font-semibold transition-all">
             <Upload size={18} /> Upload Notes
           </button>
         </div>

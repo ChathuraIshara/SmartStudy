@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Upload, FileText, Layers, HelpCircle, BookOpen, CloudUpload, 
-  Loader2, FileSearch, X, CheckCircle 
+  Loader2, FileSearch, X, CheckCircle,MessageSquare
 } from 'lucide-react';
 
 interface UploadViewProps {
@@ -11,9 +11,10 @@ interface UploadViewProps {
   onQuizGenerated: (quizData: any) => void; 
   onFlashcardsGenerated: (flashcards: any) => void;
   onRevisionGenerated: (notes: any) => void;
+  onChatStart: (text: string) => void;
 }
 
-const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated, onRevisionGenerated }: UploadViewProps) => {
+const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated, onRevisionGenerated, onChatStart }: UploadViewProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -166,6 +167,14 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated,
     }
   };
 
+  const handleChatClick = () => {
+    if (!selectedFile) return alert("Please upload a file first!");
+    if (!previewText) return alert("Still extracting text, please wait a moment...");
+    
+    // Pass the extracted text to the parent
+    onChatStart(previewText);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center py-20 px-4 animate-in fade-in zoom-in duration-300 relative">
       
@@ -284,6 +293,13 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated,
                active={!!selectedFile}
             />
          </button>
+         <button onClick={handleChatClick} disabled={!selectedFile || !previewText} className="text-left w-full md:col-span-2">
+             <OptionCard 
+               icon={MessageSquare} 
+               label="Chat with your Notes" 
+               active={!!selectedFile}
+             />
+          </button>
         </div>
       </div>
     </div>

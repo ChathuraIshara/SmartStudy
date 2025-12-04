@@ -11,6 +11,7 @@ import SummaryView from "./components/SummaryView";
 import QuizView from "./components/QuizView"; 
 import FlashcardView from "./components/FlashcardView";
 import RevisionView from "./components/RevisionView";
+import ChatView from "./components/ChatView";
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('home');
@@ -18,6 +19,7 @@ export default function Home() {
   const [generatedQuiz, setGeneratedQuiz] = useState([]); 
   const [generatedFlashcards, setGeneratedFlashcards] = useState([]); 
   const [generatedRevision, setGeneratedRevision] = useState([]); 
+  const [chatContext, setChatContext] = useState(""); // <--- New State for PDF text
 
   // Handler for when the upload finishes successfully
   const handleSummarySuccess = (summaryText: string) => {
@@ -45,6 +47,12 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleChatStart = (text: string) => {
+    setChatContext(text);
+    setCurrentView('chat');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-white font-sans text-slate-900">
       
@@ -57,7 +65,7 @@ export default function Home() {
         {/* View 1: Home Landing Page */}
         {currentView === 'home' && (
           <>
-            <Hero />
+           <Hero onNavigate={setCurrentView} />
             <Features />
             <CallToAction />
           </>
@@ -65,7 +73,7 @@ export default function Home() {
 
         {/* View 2: Upload Page */}
         {currentView === 'upload' && (
-          <UploadView onSummaryGenerated={handleSummarySuccess} onQuizGenerated={handleQuizSuccess} onFlashcardsGenerated={handleFlashcardsSuccess} onRevisionGenerated={handleRevisionSuccess}/>
+          <UploadView onSummaryGenerated={handleSummarySuccess} onQuizGenerated={handleQuizSuccess} onFlashcardsGenerated={handleFlashcardsSuccess} onRevisionGenerated={handleRevisionSuccess} onChatStart={handleChatStart} />
         )}
 
         {/* View 3: Summary Page */}
@@ -101,10 +109,11 @@ export default function Home() {
         
 
         {/* Placeholder for future views */}
-        {(currentView === 'chat') && (
-            <div className="py-32 text-center text-gray-500">
-               Feature coming soon!
-            </div>
+       {currentView === 'chat' && (
+           <ChatView 
+             context={chatContext}
+             onBack={() => setCurrentView('upload')}
+           />
         )}
 
       </main>
