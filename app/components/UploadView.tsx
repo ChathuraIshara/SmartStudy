@@ -1,9 +1,8 @@
 "use client"
 
-import React, { useState, useRef } from 'react';
-import { Upload, FileText, Layers, HelpCircle, BookOpen, CloudUpload, Loader2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, FileText, Layers, HelpCircle, BookOpen, CloudUpload, Loader2, FileSearch } from 'lucide-react';
 
-// 1. Define the interface for props
 interface UploadViewProps {
   onSummaryGenerated: (summary: string) => void;
 }
@@ -13,9 +12,41 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Note: We removed the local 'summary' state from here
+  // New State for Preview
+  const [previewText, setPreviewText] = useState("");
+  const [isExtracting, setIsExtracting] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // --- 1. Auto-Extract Text Effect ---
+  // Whenever a new file is selected, we automatically upload it to /api/extract
+  useEffect(() => {
+    const fetchPreview = async () => {
+      if (!selectedFile) return;
+
+      setIsExtracting(true);
+      setPreviewText(""); // Clear previous text
+
+      try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const res = await fetch("/api/extract", { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (data.text) {
+          setPreviewText(data.text);
+        }
+      } catch (err) {
+        console.error("Failed to extract preview", err);
+      } finally {
+        setIsExtracting(false);
+      }
+    };
+
+    fetchPreview();
+  }, [selectedFile]);
+
 
   // --- Handlers ---
   const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragging(true); };
@@ -29,16 +60,15 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
     if (e.target.files && e.target.files.length > 0) setSelectedFile(e.target.files[0]);
   };
 
-  // --- API Call ---
+  // --- API Call for Summary ---
   const generateSummary = async () => {
-    if (!selectedFile) {
-      alert("Please upload a file first!");
-      return;
-    }
-
+    if (!selectedFile) return alert("Please upload a file first!");
+    
     setIsLoading(true);
 
     try {
+      // NOTE: Since we already have the text in 'previewText', we could send THAT to the API
+      // to save time, but to keep it simple we'll just upload the file again as per your previous logic.
       const formData = new FormData();
       formData.append("file", selectedFile);
 
@@ -47,10 +77,7 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
 
       if (data.error) throw new Error(data.error);
 
-      // Clean the summary
       const cleanSummary = data.summary.replace(data.summary.split('\n\n')[0], '').trim();
-      
-      // 2. Send data to parent instead of setting local state
       onSummaryGenerated(cleanSummary || data.summary);
 
     } catch (error) {
@@ -95,11 +122,48 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
         <input type="file" className="hidden" ref={fileInputRef} onChange={handleFileSelect} accept=".pdf" />
       </div>
 
+      {/* --- NEW: EXTRACTED TEXT PREVIEW SECTION --- */}
+      {/* Only show this if we are extracting or have text */}
+      {(previewText || isExtracting) && (
+        <div className="w-full max-w-3xl mb-8 animate-in slide-in-from-bottom-2">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Header */}
+            <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center gap-2">
+               <FileSearch size={16} className="text-gray-400"/>
+               <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Extracted Text Preview</span>
+            </div>
+            
+            {/* Content */}
+            <div className="p-6">
+              <p className="text-sm text-gray-500 mb-4">
+                This is a preview of the extracted text from <span className="font-semibold text-gray-700">"{selectedFile?.name}"</span>.
+              </p>
+              
+              <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto border border-gray-100">
+                {isExtracting ? (
+                  <div className="flex items-center justify-center h-full text-gray-400 gap-2">
+                    <Loader2 className="animate-spin" size={20} /> Extracting text...
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600 whitespace-pre-wrap font-mono leading-relaxed">
+                    {previewText}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Options Grid */}
       <div className="w-full max-w-3xl mb-8">
         <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 ml-1">Generate Study Materials</p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button onClick={generateSummary} disabled={isLoading || !selectedFile} className="text-left w-full">
+          <button 
+            onClick={generateSummary} 
+            disabled={isLoading || !selectedFile || !previewText} // Disable if no text extracted yet
+            className="text-left w-full"
+          >
              <OptionCard icon={isLoading ? Loader2 : FileText} label={isLoading ? "Generating..." : "Summarize Notes"} active={!!selectedFile}/>
           </button>
           <OptionCard icon={Layers} label="Generate Flashcards" active={false} />

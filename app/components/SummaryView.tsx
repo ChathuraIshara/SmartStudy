@@ -32,10 +32,10 @@ const SummaryView = ({ summary, onBack }: SummaryViewProps) => {
         </button>
 
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors shadow-sm">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-blue-100 font-medium transition-colors shadow-sm">
             <RefreshCw size={16} /> Regenerate
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors shadow-sm">
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-blue-700 hover:text-blue-100 font-medium transition-colors shadow-sm">
             <Download size={16} /> PDF
           </button>
         </div>
