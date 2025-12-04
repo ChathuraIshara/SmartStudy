@@ -58,7 +58,7 @@ const Footer = () => {
         {/* Bottom Section: Copyright & Socials */}
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-400 text-sm">
-            © 2024 Smart Study Assistant. All rights reserved.
+            © 2025 Smart Study Assistant. All rights reserved.
           </p>
           
           <div className="flex items-center gap-6">
