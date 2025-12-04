@@ -98,7 +98,7 @@ const FlashcardView = ({ flashcards: initialFlashcards, onBack }: FlashcardViewP
 
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors">
+        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:bg-blue-100 hover:text-blue-700 rounded-3xl px-3 py-2 font-medium transition-colors">
           <ArrowLeft size={18} /> Back to Upload
         </button>
 
