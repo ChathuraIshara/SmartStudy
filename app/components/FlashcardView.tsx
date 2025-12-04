@@ -16,8 +16,6 @@ const FlashcardView = ({ flashcards: initialFlashcards, onBack }: FlashcardViewP
   const [flippedIndices, setFlippedIndices] = useState<number[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
   
-  // We no longer need the useRef for printing
-
   const handleCardClick = (index: number) => {
     setFlippedIndices(prev => 
       prev.includes(index) ? prev.filter(i => i !== index) : [...prev, index]

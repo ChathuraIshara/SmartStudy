@@ -4,8 +4,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import PDFParser from 'pdf2json';
 import OpenAI from 'openai';
 
-// Initialize OpenAI client for Hugging Face
-
 // Helper: Parse PDF
 const parsePDF = (buffer: Buffer): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -21,7 +19,7 @@ const parsePDF = (buffer: Buffer): Promise<string> => {
 
 export async function POST(req: NextRequest) {
   try {
-    const client = new OpenAI({
+  const client = new OpenAI({
   baseURL: "https://router.huggingface.co/v1",
   apiKey: process.env.HF_TOKEN,
 });

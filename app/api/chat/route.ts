@@ -3,11 +3,9 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-
-
 export async function POST(req: NextRequest) {
   try {
-    const client = new OpenAI({
+  const client = new OpenAI({
   baseURL: "https://router.huggingface.co/v1",
   apiKey: process.env.HF_TOKEN,
 });

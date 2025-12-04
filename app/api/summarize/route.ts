@@ -1,10 +1,9 @@
-// 1. FORCE NODEJS RUNTIME (Required for pdf2json)
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import PDFParser from 'pdf2json'; // Import the new library
-import OpenAI from 'openai'; // Import the SDK
+import PDFParser from 'pdf2json'; 
+import OpenAI from 'openai'; 
 
 
 
@@ -32,7 +31,7 @@ const parsePDF = (buffer: Buffer): Promise<string> => {
 export async function POST(req: NextRequest) {
   try {
     // Initialize OpenAI client pointing to Hugging Face
-const client = new OpenAI({
+  const client = new OpenAI({
   baseURL: "https://router.huggingface.co/v1", // Same URL as your Python script
   apiKey: process.env.HF_TOKEN,
 });
@@ -85,10 +84,6 @@ const client = new OpenAI({
       max_tokens: 500,
     });
     console.log("response",response);
-
-    // if (response.data.error) {
-    //    throw new Error(response.data.error);
-    // }
 
 const summary = response.choices[0].message.content || "No summary generated.";
     return NextResponse.json({ summary });

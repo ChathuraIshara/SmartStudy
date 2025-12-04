@@ -1,4 +1,3 @@
-// components/Features.tsx
 import React from 'react';
 import { FileText, Layers, HelpCircle, BookOpen } from 'lucide-react';
 

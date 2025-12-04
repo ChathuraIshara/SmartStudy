@@ -1,4 +1,3 @@
-// components/CallToAction.tsx
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 
