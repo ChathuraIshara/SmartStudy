@@ -1,5 +1,6 @@
+	// components/Hero.tsx
 import React from 'react';
-import { ArrowRight, Upload, Sparkles, FileText, PawPrint } from 'lucide-react'; // 1. Added PawPrint icon
+import { ArrowRight, Upload, Sparkles, FileText, CheckCircle } from 'lucide-react';
 
 interface HeroProps {
   onNavigate: (view: string) => void;
@@ -10,21 +11,11 @@ const Hero = ({ onNavigate }: HeroProps) => {
     <section className="pt-20 pb-16 px-4 bg-gradient-to-b from-white to-blue-50/30">
       <div className="max-w-6xl mx-auto text-center">
         
-        {/* --- THE SURPRISE SECTION --- */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 text-amber-700 text-sm font-medium mb-8 border border-amber-200 shadow-sm hover:scale-105 transition-transform cursor-default">
-          {/* Sparkle for Ransiluni */}
-          <Sparkles size={14} className="text-amber-500 animate-pulse" />
-          <span>
-            Inspired by <span className="font-bold">Ransiluni</span>
-          </span>
-          
-          <span className="text-amber-400 mx-1">&</span>
-          
-          {/* Paw Print for Shally */}
-          <PawPrint size={14} className="text-amber-600 fill-amber-200" />
-          <span className="font-bold">Shally</span>
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-600 text-xs font-medium mb-6">
+          <Sparkles size={14} />
+          AI-Powered Study Helper
         </div>
-        {/* ---------------------------- */}
 
         {/* Headline */}
         <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight mb-6">
@@ -39,21 +30,15 @@ const Hero = ({ onNavigate }: HeroProps) => {
 
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20">
-          <button 
-            onClick={() => onNavigate('upload')} 
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-blue-200"
-          >
+          <button onClick={() => onNavigate('upload')} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-full font-semibold transition-all shadow-lg hover:shadow-blue-200">
             Get Started <ArrowRight size={18} />
           </button>
-          <button 
-            onClick={() => onNavigate('upload')} 
-            className="flex items-center gap-2 bg-white hover:bg-blue-600 hover:text-white text-gray-700 border border-gray-200 px-8 py-3.5 rounded-full font-semibold transition-all"
-          >
+          <button onClick={() => onNavigate('upload')} className="flex items-center gap-2 bg-white hover:bg-blue-700 hover:text-white text-gray-700 border border-gray-200 px-8 py-3.5 rounded-full font-semibold transition-all">
             <Upload size={18} /> Upload Notes
           </button>
         </div>
 
-        {/* Abstract Visual Cards */}
+        {/* Abstract Visual Cards (The 3 cards at the bottom of your screenshot) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-90 max-w-4xl mx-auto">
            {/* Card 1 */}
            <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
