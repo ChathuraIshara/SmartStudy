@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   experimental: {
     serverComponentsExternalPackages: ["pdf-parse"],
   },
+  devIndicators:false
   /* config options here */
 };
 
