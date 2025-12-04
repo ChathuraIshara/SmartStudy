@@ -4,6 +4,13 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import PDFParser from 'pdf2json'; // Import the new library
+import OpenAI from 'openai'; // Import the SDK
+
+// Initialize OpenAI client pointing to Hugging Face
+const client = new OpenAI({
+  baseURL: "https://router.huggingface.co/v1", // Same URL as your Python script
+  apiKey: process.env.HF_TOKEN,
+});
 
 // Helper Function: Wrap pdf2json in a Promise to make it async/await compatible
 const parsePDF = (buffer: Buffer): Promise<string> => {
@@ -66,29 +73,23 @@ export async function POST(req: NextRequest) {
     console.log("Sending to AI...");
 
     // 4. Send to Hugging Face
-    const response = await axios.post(
-      "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct",
-      { 
-        inputs: `Summarize the following text into concise bullet points:\n\n${truncatedText}`,
-        parameters: {
-          max_new_tokens: 500,
-          return_full_text: false 
+   const response = await client.chat.completions.create({
+      model: "meta-llama/Llama-3.1-8B-Instruct:novita", // Using standard 3.1 ID
+      messages: [
+        {
+          role: "user",
+          content: `Summarize the following text into concise bullet points:\n\n${truncatedText}`
         }
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.HF_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+      ],
+      max_tokens: 500,
+    });
+    console.log("response",response);
 
-    if (response.data.error) {
-       throw new Error(response.data.error);
-    }
+    // if (response.data.error) {
+    //    throw new Error(response.data.error);
+    // }
 
-    const summary = response.data[0]?.generated_text || "No summary generated.";
-
+const summary = response.choices[0].message.content || "No summary generated.";
     return NextResponse.json({ summary });
 
   } catch (error: any) {
