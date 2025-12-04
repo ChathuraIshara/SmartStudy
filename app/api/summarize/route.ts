@@ -6,11 +6,7 @@ import axios from 'axios';
 import PDFParser from 'pdf2json'; // Import the new library
 import OpenAI from 'openai'; // Import the SDK
 
-// Initialize OpenAI client pointing to Hugging Face
-const client = new OpenAI({
-  baseURL: "https://router.huggingface.co/v1", // Same URL as your Python script
-  apiKey: process.env.HF_TOKEN,
-});
+
 
 // Helper Function: Wrap pdf2json in a Promise to make it async/await compatible
 const parsePDF = (buffer: Buffer): Promise<string> => {
@@ -35,6 +31,11 @@ const parsePDF = (buffer: Buffer): Promise<string> => {
 
 export async function POST(req: NextRequest) {
   try {
+    // Initialize OpenAI client pointing to Hugging Face
+const client = new OpenAI({
+  baseURL: "https://router.huggingface.co/v1", // Same URL as your Python script
+  apiKey: process.env.HF_TOKEN,
+});
     // Check for Token
     if (!process.env.HF_TOKEN) {
       return NextResponse.json({ error: 'Missing API Token' }, { status: 500 });

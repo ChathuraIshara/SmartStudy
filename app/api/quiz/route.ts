@@ -5,10 +5,6 @@ import PDFParser from 'pdf2json';
 import OpenAI from 'openai';
 
 // Initialize OpenAI client for Hugging Face
-const client = new OpenAI({
-  baseURL: "https://router.huggingface.co/v1",
-  apiKey: process.env.HF_TOKEN,
-});
 
 // Helper: Parse PDF
 const parsePDF = (buffer: Buffer): Promise<string> => {
@@ -25,6 +21,11 @@ const parsePDF = (buffer: Buffer): Promise<string> => {
 
 export async function POST(req: NextRequest) {
   try {
+    const client = new OpenAI({
+  baseURL: "https://router.huggingface.co/v1",
+  apiKey: process.env.HF_TOKEN,
+});
+
     const formData = await req.formData();
     const file = formData.get('file') as File;
 

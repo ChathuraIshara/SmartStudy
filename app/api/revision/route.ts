@@ -4,10 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import PDFParser from 'pdf2json';
 import OpenAI from 'openai';
 
-const client = new OpenAI({
-  baseURL: "https://router.huggingface.co/v1",
-  apiKey: process.env.HF_TOKEN,
-});
+
 
 const parsePDF = (buffer: Buffer): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -23,6 +20,10 @@ const parsePDF = (buffer: Buffer): Promise<string> => {
 
 export async function POST(req: NextRequest) {
   try {
+    const client = new OpenAI({
+  baseURL: "https://router.huggingface.co/v1",
+  apiKey: process.env.HF_TOKEN,
+});
     const formData = await req.formData();
     const file = formData.get('file') as File;
 
