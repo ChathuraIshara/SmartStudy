@@ -8,12 +8,14 @@ import {
 
 interface UploadViewProps {
   onSummaryGenerated: (summary: string) => void;
+  onQuizGenerated: (quizData: any) => void; // <--- 1. NEW PROP
 }
 
-const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
+const UploadView = ({ onSummaryGenerated, onQuizGenerated }: UploadViewProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isQuizLoading, setIsQuizLoading] = useState(false);
   
   // Preview States
   const [previewText, setPreviewText] = useState("");
@@ -86,6 +88,30 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
       alert("Failed to generate summary");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const generateQuiz = async () => {
+    if (!selectedFile) return alert("Please upload a file first!");
+    
+    setIsQuizLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      
+      const res = await fetch("/api/quiz", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (data.error) throw new Error(data.error);
+      
+      // Send data to parent
+      onQuizGenerated(data.quiz);
+
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate quiz. Try again.");
+    } finally {
+      setIsQuizLoading(false);
     }
   };
 
@@ -187,7 +213,13 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
              <OptionCard icon={isLoading ? Loader2 : FileText} label={isLoading ? "Generating..." : "Summarize Notes"} active={!!selectedFile}/>
           </button>
           <OptionCard icon={Layers} label="Generate Flashcards" active={false} />
-          <OptionCard icon={HelpCircle} label="Create Quiz" active={false} />
+        <button onClick={generateQuiz} disabled={isQuizLoading || !selectedFile} className="text-left w-full">
+           <OptionCard 
+             icon={isQuizLoading ? Loader2 : HelpCircle} 
+             label={isQuizLoading ? "Creating Quiz..." : "Create Quiz"} 
+             active={!!selectedFile}
+           />
+        </button>
           <OptionCard icon={BookOpen} label="Revision Notes" active={false} />
         </div>
       </div>
@@ -203,10 +235,15 @@ const OptionCard = ({ icon: Icon, label, active }: { icon: any, label: string, a
       : 'border-gray-100 opacity-60 cursor-not-allowed'}
   `}>
     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
-      <Icon size={20} className={label === "Generating..." ? "animate-spin" : ""} />
+      {/* FIX: Updated the condition to check for "Creating Quiz..." as well 
+         or you can use: label.includes("...")
+      */}
+      <Icon 
+        size={20} 
+        className={(label === "Generating..." || label === "Creating Quiz...") ? "animate-spin" : ""} 
+      />
     </div>
     <span className="font-medium text-gray-700">{label}</span>
   </div>
 );
-
 export default UploadView;
