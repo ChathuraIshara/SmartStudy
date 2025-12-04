@@ -10,12 +10,14 @@ import UploadView from "./components/UploadView";
 import SummaryView from "./components/SummaryView"; 
 import QuizView from "./components/QuizView"; 
 import FlashcardView from "./components/FlashcardView";
+import RevisionView from "./components/RevisionView";
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('home');
   const [generatedSummary, setGeneratedSummary] = useState("");
   const [generatedQuiz, setGeneratedQuiz] = useState([]); 
-  const [generatedFlashcards, setGeneratedFlashcards] = useState([]); // <--- New State
+  const [generatedFlashcards, setGeneratedFlashcards] = useState([]); 
+  const [generatedRevision, setGeneratedRevision] = useState([]); 
 
   // Handler for when the upload finishes successfully
   const handleSummarySuccess = (summaryText: string) => {
@@ -34,6 +36,12 @@ export default function Home() {
   const handleFlashcardsSuccess = (cards: any) => {
     setGeneratedFlashcards(cards);
     setCurrentView('flashcards');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleRevisionSuccess = (notes: any) => {
+    setGeneratedRevision(notes);
+    setCurrentView('revision');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -57,7 +65,7 @@ export default function Home() {
 
         {/* View 2: Upload Page */}
         {currentView === 'upload' && (
-          <UploadView onSummaryGenerated={handleSummarySuccess} onQuizGenerated={handleQuizSuccess} onFlashcardsGenerated={handleFlashcardsSuccess}/>
+          <UploadView onSummaryGenerated={handleSummarySuccess} onQuizGenerated={handleQuizSuccess} onFlashcardsGenerated={handleFlashcardsSuccess} onRevisionGenerated={handleRevisionSuccess}/>
         )}
 
         {/* View 3: Summary Page */}
@@ -79,6 +87,13 @@ export default function Home() {
         {currentView === 'flashcards' && (
            <FlashcardView 
              flashcards={generatedFlashcards}
+             onBack={() => setCurrentView('upload')}
+           />
+        )}
+
+        {currentView === 'revision' && (
+           <RevisionView 
+             notes={generatedRevision}
              onBack={() => setCurrentView('upload')}
            />
         )}

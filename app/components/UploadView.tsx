@@ -10,9 +10,10 @@ interface UploadViewProps {
   onSummaryGenerated: (summary: string) => void;
   onQuizGenerated: (quizData: any) => void; 
   onFlashcardsGenerated: (flashcards: any) => void;
+  onRevisionGenerated: (notes: any) => void;
 }
 
-const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated }: UploadViewProps) => {
+const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated, onRevisionGenerated }: UploadViewProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +23,8 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated 
   const [previewText, setPreviewText] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
 
-  const [isFlashcardsLoading, setIsFlashcardsLoading] = useState(false); // <--- New State
+  const [isFlashcardsLoading, setIsFlashcardsLoading] = useState(false); 
+  const [isRevisionLoading, setIsRevisionLoading] = useState(false); 
 
   // Toast Notification State
   const [showSuccessToast, setShowSuccessToast] = useState(false);
@@ -95,6 +97,29 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated 
       alert("Failed to generate flashcards.");
     } finally {
       setIsFlashcardsLoading(false);
+    }
+  };
+
+  const generateRevision = async () => {
+    if (!selectedFile) return alert("Please upload a file first!");
+    
+    setIsRevisionLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      
+      const res = await fetch("/api/revision", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (data.error) throw new Error(data.error);
+      
+      onRevisionGenerated(data.revision);
+
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate revision notes.");
+    } finally {
+      setIsRevisionLoading(false);
     }
   };
 
@@ -252,7 +277,13 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated 
              active={!!selectedFile}
            />
         </button>
-          <OptionCard icon={BookOpen} label="Revision Notes" active={false} />
+         <button onClick={generateRevision} disabled={isRevisionLoading || !selectedFile} className="text-left w-full">
+            <OptionCard 
+               icon={isRevisionLoading ? Loader2 : BookOpen} 
+               label={isRevisionLoading ? "Drafting Notes..." : "Revision Notes"} 
+               active={!!selectedFile}
+            />
+         </button>
         </div>
       </div>
     </div>
