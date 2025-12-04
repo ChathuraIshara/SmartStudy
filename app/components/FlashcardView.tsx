@@ -66,13 +66,13 @@ const FlashcardView = ({ flashcards: initialFlashcards, onBack }: FlashcardViewP
       element.innerHTML = contentHTML;
 
       // 3. Generate PDF from this clean element
-      const opt = {
-        margin:       0.5,
-        filename:     'SmartStudy-Flashcards.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-      };
+            const opt: any = {
+              margin:       0.5,
+              filename:     'SmartStudy-Flashcards.pdf',
+              image:        { type: 'jpeg' as const, quality: 0.98 },
+              html2canvas:  { scale: 2 },
+              jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
 
       await html2pdf().set(opt).from(element).save();
 
@@ -98,7 +98,7 @@ const FlashcardView = ({ flashcards: initialFlashcards, onBack }: FlashcardViewP
 
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
-        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:bg-blue-100 hover:text-blue-700 rounded-3xl px-3 py-2 font-medium transition-colors">
+        <button onClick={onBack} className="flex items-center gap-2 text-gray-600 hover:bg-blue-100 hover:text-blue-700 rounded-3xl px-3 py-2   font-medium transition-colors">
           <ArrowLeft size={18} /> Back to Upload
         </button>
 

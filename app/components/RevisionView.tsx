@@ -48,10 +48,10 @@ const RevisionView = ({ notes, onBack }: RevisionViewProps) => {
 
       element.innerHTML = contentHTML;
 
-      const opt = {
+      const opt:any = {
         margin:       0.5,
         filename:     'SmartStudy-RevisionNotes.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
+        image:        { type: 'jpeg' as const, quality: 0.98 },
         html2canvas:  { scale: 2 },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
       };

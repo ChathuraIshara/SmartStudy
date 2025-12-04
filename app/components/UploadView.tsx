@@ -316,12 +316,9 @@ const OptionCard = ({ icon: Icon, label, active }: { icon: any, label: string, a
     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
       <Icon 
         size={20} 
-        // FIX: Check for "Generating Cards..." OR simply check if it includes "..."
-        className={
-          (label === "Generating..." || label === "Creating Quiz..." || label === "Generating Cards...") 
-          ? "animate-spin" 
-          : ""
-        } 
+        // FIX: Now checks if the label contains "..." 
+        // This automatically works for "Generating...", "Creating Quiz...", "Generating Cards...", and "Drafting Notes..."
+        className={label.includes("...") ? "animate-spin" : ""} 
       />
     </div>
     <span className="font-medium text-gray-700">{label}</span>
