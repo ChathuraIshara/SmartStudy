@@ -7,7 +7,7 @@ import PDFParser from 'pdf2json';
 // Helper: Parse PDF Buffer
 const parsePDF = (buffer: Buffer): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const parser = new PDFParser(null, 1); // 1 = Raw Text
+    const parser = new PDFParser(null); // 1 = Raw Text
     parser.on('pdfParser_dataError', (errData: any) => reject(errData.parserError));
     parser.on('pdfParser_dataReady', () => {
       const text = (parser as any).getRawTextContent();

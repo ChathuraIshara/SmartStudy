@@ -11,7 +11,7 @@ const client = new OpenAI({
 
 const parsePDF = (buffer: Buffer): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const parser = new PDFParser(null, 1);
+    const parser = new PDFParser(null);
     parser.on('pdfParser_dataError', (errData: any) => reject(errData.parserError));
     parser.on('pdfParser_dataReady', () => {
       const text = (parser as any).getRawTextContent();

@@ -15,7 +15,7 @@ const client = new OpenAI({
 // Helper Function: Wrap pdf2json in a Promise to make it async/await compatible
 const parsePDF = (buffer: Buffer): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const parser = new PDFParser(null, 1); // '1' tells it to parse as Raw Text
+    const parser = new PDFParser(null); // '1' tells it to parse as Raw Text
 
     parser.on('pdfParser_dataError', (errData: any) => {
       console.error(errData.parserError);
