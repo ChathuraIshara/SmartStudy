@@ -8,12 +8,14 @@ import CallToAction from "./components/CallToAction";
 import Footer from "./components/Footer";
 import UploadView from "./components/UploadView";
 import SummaryView from "./components/SummaryView"; 
-import QuizView from "./components/QuizView"; // <--- New Import
+import QuizView from "./components/QuizView"; 
+import FlashcardView from "./components/FlashcardView";
 
 export default function Home() {
   const [currentView, setCurrentView] = useState('home');
   const [generatedSummary, setGeneratedSummary] = useState("");
-  const [generatedQuiz, setGeneratedQuiz] = useState([]); // <--- New State
+  const [generatedQuiz, setGeneratedQuiz] = useState([]); 
+  const [generatedFlashcards, setGeneratedFlashcards] = useState([]); // <--- New State
 
   // Handler for when the upload finishes successfully
   const handleSummarySuccess = (summaryText: string) => {
@@ -26,6 +28,12 @@ export default function Home() {
   const handleQuizSuccess = (quizData: any) => {
     setGeneratedQuiz(quizData);
     setCurrentView('quiz');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleFlashcardsSuccess = (cards: any) => {
+    setGeneratedFlashcards(cards);
+    setCurrentView('flashcards');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -49,7 +57,7 @@ export default function Home() {
 
         {/* View 2: Upload Page */}
         {currentView === 'upload' && (
-          <UploadView onSummaryGenerated={handleSummarySuccess} onQuizGenerated={handleQuizSuccess}/>
+          <UploadView onSummaryGenerated={handleSummarySuccess} onQuizGenerated={handleQuizSuccess} onFlashcardsGenerated={handleFlashcardsSuccess}/>
         )}
 
         {/* View 3: Summary Page */}
@@ -68,10 +76,17 @@ export default function Home() {
            />
         )}
 
+        {currentView === 'flashcards' && (
+           <FlashcardView 
+             flashcards={generatedFlashcards}
+             onBack={() => setCurrentView('upload')}
+           />
+        )}
+
         
 
         {/* Placeholder for future views */}
-        {(currentView === 'flashcards' || currentView === 'chat') && (
+        {(currentView === 'chat') && (
             <div className="py-32 text-center text-gray-500">
                Feature coming soon!
             </div>

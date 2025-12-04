@@ -8,10 +8,11 @@ import {
 
 interface UploadViewProps {
   onSummaryGenerated: (summary: string) => void;
-  onQuizGenerated: (quizData: any) => void; // <--- 1. NEW PROP
+  onQuizGenerated: (quizData: any) => void; 
+  onFlashcardsGenerated: (flashcards: any) => void;
 }
 
-const UploadView = ({ onSummaryGenerated, onQuizGenerated }: UploadViewProps) => {
+const UploadView = ({ onSummaryGenerated, onQuizGenerated,onFlashcardsGenerated }: UploadViewProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +21,8 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated }: UploadViewProps) =>
   // Preview States
   const [previewText, setPreviewText] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
+
+  const [isFlashcardsLoading, setIsFlashcardsLoading] = useState(false); // <--- New State
 
   // Toast Notification State
   const [showSuccessToast, setShowSuccessToast] = useState(false);
@@ -70,6 +73,29 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated }: UploadViewProps) =>
   const handleBoxClick = () => fileInputRef.current?.click();
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) setSelectedFile(e.target.files[0]);
+  };
+
+  const generateFlashcards = async () => {
+    if (!selectedFile) return alert("Please upload a file first!");
+    
+    setIsFlashcardsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      
+      const res = await fetch("/api/flashcards", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (data.error) throw new Error(data.error);
+      
+      onFlashcardsGenerated(data.flashcards); // Send to parent
+
+    } catch (error) {
+      console.error(error);
+      alert("Failed to generate flashcards.");
+    } finally {
+      setIsFlashcardsLoading(false);
+    }
   };
 
   const generateSummary = async () => {
@@ -212,7 +238,13 @@ const UploadView = ({ onSummaryGenerated, onQuizGenerated }: UploadViewProps) =>
           >
              <OptionCard icon={isLoading ? Loader2 : FileText} label={isLoading ? "Generating..." : "Summarize Notes"} active={!!selectedFile}/>
           </button>
-          <OptionCard icon={Layers} label="Generate Flashcards" active={false} />
+        <button onClick={generateFlashcards} disabled={isFlashcardsLoading || !selectedFile} className="text-left w-full">
+           <OptionCard 
+             icon={isFlashcardsLoading ? Loader2 : Layers} 
+             label={isFlashcardsLoading ? "Generating Cards..." : "Generate Flashcards"} 
+             active={!!selectedFile}
+           />
+        </button>
         <button onClick={generateQuiz} disabled={isQuizLoading || !selectedFile} className="text-left w-full">
            <OptionCard 
              icon={isQuizLoading ? Loader2 : HelpCircle} 
@@ -235,12 +267,14 @@ const OptionCard = ({ icon: Icon, label, active }: { icon: any, label: string, a
       : 'border-gray-100 opacity-60 cursor-not-allowed'}
   `}>
     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'}`}>
-      {/* FIX: Updated the condition to check for "Creating Quiz..." as well 
-         or you can use: label.includes("...")
-      */}
       <Icon 
         size={20} 
-        className={(label === "Generating..." || label === "Creating Quiz...") ? "animate-spin" : ""} 
+        // FIX: Check for "Generating Cards..." OR simply check if it includes "..."
+        className={
+          (label === "Generating..." || label === "Creating Quiz..." || label === "Generating Cards...") 
+          ? "animate-spin" 
+          : ""
+        } 
       />
     </div>
     <span className="font-medium text-gray-700">{label}</span>
