@@ -21,7 +21,7 @@ const SummaryView = ({ summary, onBack }: SummaryViewProps) => {
       const html2pdf = (await import('html2pdf.js')).default;
       const element = summaryContentRef.current;
       
-      const opt = {
+      const opt:any = {
         margin:       [0.5, 0.5],
         filename:     'SmartStudy-Summary.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
