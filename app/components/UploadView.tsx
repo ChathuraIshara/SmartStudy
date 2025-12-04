@@ -1,7 +1,10 @@
 "use client"
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, FileText, Layers, HelpCircle, BookOpen, CloudUpload, Loader2, FileSearch } from 'lucide-react';
+import { 
+  Upload, FileText, Layers, HelpCircle, BookOpen, CloudUpload, 
+  Loader2, FileSearch, X, CheckCircle 
+} from 'lucide-react';
 
 interface UploadViewProps {
   onSummaryGenerated: (summary: string) => void;
@@ -12,20 +15,23 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   
-  // New State for Preview
+  // Preview States
   const [previewText, setPreviewText] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
 
+  // Toast Notification State
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // --- 1. Auto-Extract Text Effect ---
-  // Whenever a new file is selected, we automatically upload it to /api/extract
+  // --- 1. Auto-Extract & Show Toast Effect ---
   useEffect(() => {
     const fetchPreview = async () => {
       if (!selectedFile) return;
 
       setIsExtracting(true);
-      setPreviewText(""); // Clear previous text
+      setPreviewText(""); 
+      setShowSuccessToast(false); // Reset toast
 
       try {
         const formData = new FormData();
@@ -36,6 +42,10 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
 
         if (data.text) {
           setPreviewText(data.text);
+          setShowSuccessToast(true); // <--- SHOW POPUP HERE
+
+          // Optional: Auto-hide the popup after 4 seconds
+          setTimeout(() => setShowSuccessToast(false), 4000);
         }
       } catch (err) {
         console.error("Failed to extract preview", err);
@@ -60,26 +70,17 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
     if (e.target.files && e.target.files.length > 0) setSelectedFile(e.target.files[0]);
   };
 
-  // --- API Call for Summary ---
   const generateSummary = async () => {
     if (!selectedFile) return alert("Please upload a file first!");
-    
     setIsLoading(true);
-
     try {
-      // NOTE: Since we already have the text in 'previewText', we could send THAT to the API
-      // to save time, but to keep it simple we'll just upload the file again as per your previous logic.
       const formData = new FormData();
       formData.append("file", selectedFile);
-
       const res = await fetch("/api/summarize", { method: "POST", body: formData });
       const data = await res.json();
-
       if (data.error) throw new Error(data.error);
-
       const cleanSummary = data.summary.replace(data.summary.split('\n\n')[0], '').trim();
       onSummaryGenerated(cleanSummary || data.summary);
-
     } catch (error) {
       console.error(error);
       alert("Failed to generate summary");
@@ -89,8 +90,32 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 animate-in fade-in zoom-in duration-300">
+    <div className="flex flex-col items-center justify-center py-20 px-4 animate-in fade-in zoom-in duration-300 relative">
       
+      {/* --- NEW: SUCCESS TOAST POPUP --- */}
+      {showSuccessToast && (
+        <div className="fixed top-24 right-4 md:right-8 z-50 bg-white p-5 rounded-xl shadow-2xl border border-gray-100 max-w-sm animate-in slide-in-from-right-10 duration-300 flex items-start gap-4">
+          <button 
+            onClick={() => setShowSuccessToast(false)}
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+          >
+            <X size={16} />
+          </button>
+          
+          <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0 text-green-600">
+             <CheckCircle size={20} />
+          </div>
+
+          <div>
+            <h4 className="font-bold text-gray-900 mb-1">File uploaded successfully</h4>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              Your notes have been processed and are ready for AI generation.
+            </p>
+          </div>
+        </div>
+      )}
+      {/* ------------------------------- */}
+
       {/* Title */}
       <div className="text-center mb-10 max-w-2xl">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">Upload Your Notes</h2>
@@ -122,23 +147,18 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
         <input type="file" className="hidden" ref={fileInputRef} onChange={handleFileSelect} accept=".pdf" />
       </div>
 
-      {/* --- NEW: EXTRACTED TEXT PREVIEW SECTION --- */}
-      {/* Only show this if we are extracting or have text */}
+      {/* Extracted Text Preview */}
       {(previewText || isExtracting) && (
         <div className="w-full max-w-3xl mb-8 animate-in slide-in-from-bottom-2">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            {/* Header */}
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center gap-2">
                <FileSearch size={16} className="text-gray-400"/>
                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Extracted Text Preview</span>
             </div>
-            
-            {/* Content */}
             <div className="p-6">
               <p className="text-sm text-gray-500 mb-4">
                 This is a preview of the extracted text from <span className="font-semibold text-gray-700">"{selectedFile?.name}"</span>.
               </p>
-              
               <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto border border-gray-100">
                 {isExtracting ? (
                   <div className="flex items-center justify-center h-full text-gray-400 gap-2">
@@ -161,7 +181,7 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <button 
             onClick={generateSummary} 
-            disabled={isLoading || !selectedFile || !previewText} // Disable if no text extracted yet
+            disabled={isLoading || !selectedFile || !previewText}
             className="text-left w-full"
           >
              <OptionCard icon={isLoading ? Loader2 : FileText} label={isLoading ? "Generating..." : "Summarize Notes"} active={!!selectedFile}/>
@@ -175,7 +195,6 @@ const UploadView = ({ onSummaryGenerated }: UploadViewProps) => {
   );
 };
 
-// Helper Component
 const OptionCard = ({ icon: Icon, label, active }: { icon: any, label: string, active: boolean }) => (
   <div className={`
     flex items-center gap-4 p-4 bg-white border rounded-xl shadow-sm transition-all
